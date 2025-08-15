@@ -1,5 +1,6 @@
 package com.uber.UberAuthService.dtos;
 
+import com.uber.UberAuthService.models.Passenger;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,10 +13,21 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 public class PassengerDto {
-    private String id;
+    private Long id;
     private String name;
     private String email;
     private String phoneNumber;
     private String password;
     private Date createdAt;
+
+    public static PassengerDto fromPassenger(Passenger passenger) {
+        return PassengerDto.builder()
+                .id(passenger.getId())
+                .name(passenger.getName())
+                .email(passenger.getEmail())
+                .phoneNumber(passenger.getPhoneNumber())
+                .password(passenger.getPassword())
+                .createdAt(passenger.getCreatedAt())
+                .build();
+    }
 }
