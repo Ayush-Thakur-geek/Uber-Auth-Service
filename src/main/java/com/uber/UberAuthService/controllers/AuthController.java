@@ -31,4 +31,9 @@ public class AuthController {
         }
         return new ResponseEntity<>(passengerDto, HttpStatus.CREATED);
     }
+
+    @PostMapping("/signin/passenger")
+    public ResponseEntity<?> signInPassenger() {
+        return null;
+    }
 }

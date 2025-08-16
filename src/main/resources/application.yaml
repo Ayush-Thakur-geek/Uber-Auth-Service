@@ -17,5 +17,10 @@ spring:
       hibernate:
         format_sql: true
         enable_lazy_load_no_trans: true
+
 server:
   port: 8081
+
+jwt:
+  expiry: 3600
+  secret: "Thakurs@7777hsjhdfjkbsbdfjkbijkwbiufbdidsbikbfjksbdfijbiuwbheiurhiudebi"
