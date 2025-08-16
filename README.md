@@ -26,3 +26,41 @@ In the image "Types-of-Auths.jpg," you’ll see a conceptual overview of authent
 i.e., the token won't be accessible on the client side."
 Why? This design prevents client-side scripts from stealing authentication tokens, protecting users against many XSS 
 exploits.`
+
+## 🔥 Auth Service Architecture
+![Auth Service Architecture](/images/Auth%20Server%20Architecture.png)
+The image "Auth-Server-Architecture.jpg" visualizes the complete authentication flow:
+
+1. **User Action**: User sends email and password from client (Browser/Postman) to the Auth Server.
+
+2. **Auth Server**: Validates credentials, issues a JWT on success.
+
+3. **JWT Handling**: JWT goes back to the client (browser/Postman). For protected resources, client passes the JWT to a resource server.
+
+4. **Resource Server**: Validates JWT either locally or by consulting the Auth Server. Upon successful validation, a response is served back to the client.
+
+### Key Points:
+
+* The flow is stateless—no session maintained on servers, only JWT.
+
+* The JWT represents identity and permissions securely.
+
+* Resource servers rely on JWT validation to control access.
+
+## 🌍 OAuth Architecture
+![OAuth Architecture](/images/OAuth%20Architecture.png)
+The image demonstrates how federated login works (example: Google OAuth):
+
+* **User logs in with Google**: The login page redirects to Google Auth Server for credential verification.
+
+* **Tokens Issued**: After verification, Google provides a one-time auth token to the resource server.
+
+* **Access Control**: The resource server passes the token to the user, who can use it to access protected resources.
+
+## 💡 Security Tips
+* Always use HTTPS in production.
+
+* Ensure JWT token cookies are HttpOnly, Secure, and SameSite=Strict.
+
+* Configure appropriate token expiry and support refresh tokens.
+
