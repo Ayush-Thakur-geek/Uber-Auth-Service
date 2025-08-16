@@ -11,4 +11,4 @@ resource servers, perfectly suited for scalable and stateless applications.
 * **Plug-and-Play**: Easily connect your resource servers, microservices, or client apps.
 
 ## 🗝️ Types of Authentication
-![Types of Authentications mechanism]("./images/Types of Auths.png")
+![Types of Authentications mechanism](/images/Types%20of%20Auths.png)
