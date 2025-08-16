@@ -1,20 +1,42 @@
 package com.uber.UberAuthService.controllers;
 
+import com.uber.UberAuthService.dtos.AuthRequestDto;
 import com.uber.UberAuthService.dtos.PassengerDto;
 import com.uber.UberAuthService.dtos.PassengerSignUpRequestDto;
 import com.uber.UberAuthService.services.AuthService;
+import com.uber.UberAuthService.services.JwtService;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+@Log4j2
 public class AuthController {
 
-    private final AuthService authService;
+    @Value("${cookie.expiry}")
+    private int cookieExpire;
 
-    AuthController(AuthService authService) {
+    private final AuthService authService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+
+    AuthController(
+            AuthService authService,
+            AuthenticationManager authenticationManager,
+            JwtService jwtService
+    ) {
         this.authService = authService;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/signup/passenger")
@@ -27,8 +49,28 @@ public class AuthController {
         return new ResponseEntity<>(passengerDto, HttpStatus.CREATED);
     }
 
-    @GetMapping("signin/passenger")
-    public ResponseEntity<?> signInPassenger() {
-        return null;
+    @PostMapping("/signin/passenger")
+    public ResponseEntity<?> signInPassenger(@RequestBody AuthRequestDto authRequestDto, HttpServletResponse response) {
+        log.info("Hey, i am here");
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        authRequestDto.getUsername(), authRequestDto.getPassword()
+                )
+        );
+
+        if (authentication.isAuthenticated()) {
+            System.out.println(authentication.getName());
+            String token = jwtService.createToken(authentication.getName());
+            ResponseCookie cookie = ResponseCookie.from("JwtToken", token)
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/")
+                    .maxAge(cookieExpire)
+                    .build();
+            response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+            return new ResponseEntity<>("Successful Authentication", HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 }

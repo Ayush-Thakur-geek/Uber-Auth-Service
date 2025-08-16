@@ -1,10 +1,11 @@
 package com.uber.UberAuthService.services;
 
+import com.uber.UberAuthService.models.Passenger;
+import com.uber.UberAuthService.repositories.PassengerRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -12,10 +13,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 @Service
-public class JwtService implements CommandLineRunner {
+public class JwtService {
 
     @Value("${jwt.expiry}")
     private int expiry;
@@ -23,7 +25,27 @@ public class JwtService implements CommandLineRunner {
     @Value("${jwt.secret}")
     private String SECRET;
 
-    private String createToken(Map<String, Object> payLoad, String email) {
+    private PassengerRepository passengerRepository;
+
+    public JwtService(PassengerRepository passengerRepository) {
+        this.passengerRepository = passengerRepository;
+    }
+
+    public String createToken(String email) {
+
+        Optional<Passenger> passenger = passengerRepository.findPassengerByEmail(email);
+
+        System.out.println(passenger);
+
+        if (!passenger.isPresent()) {
+            throw new IllegalArgumentException("Invalid email");
+        }
+
+        Map<String, Object> payLoad = new HashMap<>();
+        payLoad.put("email", email);
+        payLoad.put("name", passenger.get().getName());
+        payLoad.put("phoneNumber", passenger.get().getPhoneNumber());
+        payLoad.put("createdAt", passenger.get().getCreatedAt());
 
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiry*1000L);
@@ -71,18 +93,6 @@ public class JwtService implements CommandLineRunner {
     private Boolean validateToken(String token, String email) {
         final String userEmailFetchedFromToken = extractEmail(token);
         return userEmailFetchedFromToken.equals(email) && isTokenExpired(token);
-    }
-
-    @Override
-    public void run(String... args) throws Exception {
-        Map<String, Object> payLoad = new HashMap<>();
-        payLoad.put("email", "aer@uber.com");
-        payLoad.put("name", "Uber Auth Service");
-        payLoad.put("role", "admin");
-        payLoad.put("password", "password");
-        String token = createToken(payLoad, "admin");
-        System.out.println(extractAllPayLoads(token));
-        System.out.println(extractPayload(token, "email").toString());
     }
 
     private SecretKey getSECRET() {

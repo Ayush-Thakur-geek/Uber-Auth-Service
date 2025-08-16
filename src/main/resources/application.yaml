@@ -24,3 +24,6 @@ server:
 jwt:
   expiry: 3600
   secret: "Thakurs@7777hsjhdfjkbsbdfjkbijkwbiufbdidsbikbfjksbdfijbiuwbheiurhiudebi"
+
+cookie:
+  expiry: 3600

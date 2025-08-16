@@ -22,8 +22,8 @@ public class AuthService {
         Passenger passenger = Passenger.builder()
                 .name(requestDto.getName())
                 .email(requestDto.getEmail())
-                .phoneNumber(bCryptPasswordEncoder.encode(requestDto.getPhoneNumber()))
-                .password(requestDto.getPassword())
+                .phoneNumber(requestDto.getPhoneNumber())
+                .password(bCryptPasswordEncoder.encode(requestDto.getPassword()))
                 .build();
 
         System.out.println(passenger);
