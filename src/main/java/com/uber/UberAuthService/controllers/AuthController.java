@@ -5,12 +5,7 @@ import com.uber.UberAuthService.dtos.PassengerSignUpRequestDto;
 import com.uber.UberAuthService.services.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -32,7 +27,7 @@ public class AuthController {
         return new ResponseEntity<>(passengerDto, HttpStatus.CREATED);
     }
 
-    @PostMapping("/signin/passenger")
+    @GetMapping("signin/passenger")
     public ResponseEntity<?> signInPassenger() {
         return null;
     }
