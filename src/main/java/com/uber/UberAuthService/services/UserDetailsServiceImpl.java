@@ -26,6 +26,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         Optional<Passenger> passenger = passengerRepository.findPassengerByEmail(username);
 
+        System.out.println("passenger found: " + passenger);
+
         if (passenger.isPresent()) {
             return new AuthPassengerDetails(passenger.get());
         } else {

@@ -5,6 +5,8 @@ import com.uber.UberAuthService.dtos.PassengerDto;
 import com.uber.UberAuthService.dtos.PassengerSignUpRequestDto;
 import com.uber.UberAuthService.services.AuthService;
 import com.uber.UberAuthService.services.JwtService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +17,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.Arrays;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -50,7 +56,11 @@ public class AuthController {
     }
 
     @PostMapping("/signin/passenger")
-    public ResponseEntity<?> signInPassenger(@RequestBody AuthRequestDto authRequestDto, HttpServletResponse response) {
+    public ResponseEntity<?> signInPassenger(
+            @RequestBody AuthRequestDto authRequestDto,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
         log.info("Hey, i am here");
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -60,6 +70,7 @@ public class AuthController {
 
         if (authentication.isAuthenticated()) {
             System.out.println(authentication.getName());
+
             String token = jwtService.createToken(authentication.getName());
             ResponseCookie cookie = ResponseCookie.from("JwtToken", token)
                     .httpOnly(true)
@@ -72,5 +83,18 @@ public class AuthController {
         }
 
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+
+    @GetMapping("/validate")
+    public ResponseEntity<?> validatePassenger(HttpServletRequest request) {
+        System.out.println("Inside validate controller");
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("JwtToken")) {
+                String token = cookie.getValue();
+                System.out.println(token);
+            }
+        }
+        return  new ResponseEntity<>(request.getHeader("Cookie"), HttpStatus.OK);
     }
 }

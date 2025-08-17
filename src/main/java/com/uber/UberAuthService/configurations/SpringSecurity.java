@@ -1,5 +1,6 @@
 package com.uber.UberAuthService.configurations;
 
+import com.uber.UberAuthService.filters.JwtAuthFilter;
 import com.uber.UberAuthService.services.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,11 +15,18 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 @Configuration
 @EnableWebSecurity
 public class SpringSecurity {
+
+    private final JwtAuthFilter jwtAuthFilter;
+
+    public SpringSecurity(JwtAuthFilter jwtAuthFilter) {
+        this.jwtAuthFilter = jwtAuthFilter;
+    }
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -33,7 +41,10 @@ public class SpringSecurity {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/v1/auth/signup/**").permitAll()
                         .requestMatchers("/api/v1/auth/signin/**").permitAll()
-                        .anyRequest().authenticated());
+                        .anyRequest().authenticated()
+                )
+                .authenticationProvider(authProvider())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -62,6 +73,10 @@ public class SpringSecurity {
     }
 
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedOriginPatterns("*").allowedMethods("GET", "POST", "PUT", "DELETE");
+        registry.addMapping("/**")
+                .allowCredentials(true)
+                .allowedOriginPatterns("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE");
     }
+
 }

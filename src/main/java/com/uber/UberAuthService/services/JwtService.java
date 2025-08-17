@@ -81,7 +81,7 @@ public class JwtService {
         return extractExpiration(token).before(new Date());
     }
 
-    private String extractEmail(String token) {
+    public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -90,9 +90,13 @@ public class JwtService {
         return claims.get(payLoadKey);
     }
 
-    private Boolean validateToken(String token, String email) {
+    public Boolean validateToken(String token, String email) {
+        System.out.println("token validation: " + token);
         final String userEmailFetchedFromToken = extractEmail(token);
-        return userEmailFetchedFromToken.equals(email) && isTokenExpired(token);
+        System.out.println("userEmailFetchedFromToken: " + userEmailFetchedFromToken);
+        System.out.println("correct email: " + userEmailFetchedFromToken.equals(email));
+        System.out.println("token expired: " + isTokenExpired(token));
+        return userEmailFetchedFromToken.equals(email) && !isTokenExpired(token);
     }
 
     private SecretKey getSECRET() {

@@ -9,9 +9,9 @@ import java.util.List;
 
 public class AuthPassengerDetails extends Passenger implements UserDetails {
 
-    private String username;
+    private final String username;
 
-    private String password;
+    private final String password;
 
     public AuthPassengerDetails(Passenger passenger) {
         this.username = passenger.getEmail();
@@ -25,11 +25,13 @@ public class AuthPassengerDetails extends Passenger implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        System.out.println("password: " +  this.password);
+        return this.password;
     }
 
     @Override
     public String getUsername() {
+        System.out.println("email: " +  this.username);
         return this.username;
     }
 }
