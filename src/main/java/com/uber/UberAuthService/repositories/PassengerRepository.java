@@ -1,6 +1,6 @@
 package com.uber.UberAuthService.repositories;
 
-import com.uber.UberAuthService.models.Passenger;
+import com.uber.UberEntityService.models.Passenger;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

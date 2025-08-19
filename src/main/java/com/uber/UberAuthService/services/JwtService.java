@@ -1,6 +1,6 @@
 package com.uber.UberAuthService.services;
 
-import com.uber.UberAuthService.models.Passenger;
+import com.uber.UberEntityService.models.Passenger;
 import com.uber.UberAuthService.repositories.PassengerRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
