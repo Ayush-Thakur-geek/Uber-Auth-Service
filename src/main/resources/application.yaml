@@ -6,7 +6,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DB_HOST:localhost}:3306/uber_local_db
     username: root
-    password: Thakur@7
+    password: ${MYSQL_PASSWORD}
 
   jpa:
     hibernate:
