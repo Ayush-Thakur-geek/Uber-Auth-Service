@@ -14,4 +14,5 @@ public class PassengerSignUpRequestDto {
     private String email;
     private String phoneNumber;
     private String password;
+    private Double rating;
 }

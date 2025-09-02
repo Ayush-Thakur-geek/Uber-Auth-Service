@@ -24,6 +24,7 @@ public class AuthService {
                 .email(requestDto.getEmail())
                 .phoneNumber(requestDto.getPhoneNumber())
                 .password(bCryptPasswordEncoder.encode(requestDto.getPassword()))
+                .rating(requestDto.getRating())
                 .build();
 
         System.out.println(passenger);

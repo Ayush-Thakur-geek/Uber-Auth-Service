@@ -5,6 +5,7 @@ import com.uber.UberAuthService.dtos.PassengerDto;
 import com.uber.UberAuthService.dtos.PassengerSignUpRequestDto;
 import com.uber.UberAuthService.services.AuthService;
 import com.uber.UberAuthService.services.JwtService;
+import com.uber.UberAuthService.services.UserDetailsServiceImpl;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,7 +18,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -42,12 +46,20 @@ public class AuthController {
     }
 
     @PostMapping("/signup/passenger")
-    public ResponseEntity<PassengerDto> signUpPassenger(@RequestBody PassengerSignUpRequestDto requestDto) {
+    public ResponseEntity<PassengerDto> signUpPassenger(@RequestBody PassengerSignUpRequestDto requestDto, HttpServletResponse response) {
         PassengerDto passengerDto = authService.signUpPassenger(requestDto);
         System.out.println(passengerDto);
         if (passengerDto == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        String token = jwtService.createToken(requestDto.getEmail());
+        ResponseCookie cookie = ResponseCookie.from("JwtToken", token)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(cookieExpire)
+                .build();
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         return new ResponseEntity<>(passengerDto, HttpStatus.CREATED);
     }
 
@@ -82,15 +94,23 @@ public class AuthController {
     }
 
     @GetMapping("/validate")
-    public ResponseEntity<?> validatePassenger(HttpServletRequest request) {
+    public ResponseEntity<?> validatePassenger(HttpServletRequest request, Principal principal) {
         System.out.println("Inside validate controller");
         Cookie[] cookies = request.getCookies();
+        String token = null;
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("JwtToken")) {
-                String token = cookie.getValue();
+                token = cookie.getValue();
                 System.out.println(token);
             }
         }
-        return  new ResponseEntity<>(request.getHeader("Cookie"), HttpStatus.OK);
+        if (token == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        boolean valid = jwtService.validateToken(token, principal.getName());
+        if (!valid) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity<>(request.getHeader("Cookie"), HttpStatus.OK);
     }
 }
