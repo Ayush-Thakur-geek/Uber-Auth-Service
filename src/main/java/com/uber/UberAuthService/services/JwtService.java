@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -97,6 +98,16 @@ public class JwtService {
         System.out.println("correct email: " + userEmailFetchedFromToken.equals(email));
         System.out.println("token expired: " + isTokenExpired(token));
         return userEmailFetchedFromToken.equals(email) && !isTokenExpired(token);
+    }
+
+    public String validateTokenForOtherServices(String token) {
+        System.out.println("token validation: " + token);
+        final String userEmailFetchedFromToken = extractEmail(token);
+        if (isTokenExpired(token)) {
+            System.out.println("token expired");
+            return null;
+        }
+        return userEmailFetchedFromToken;
     }
 
     private SecretKey getSECRET() {

@@ -23,7 +23,7 @@ server:
 
 jwt:
   expiry: 3600
-  secret: "Thakurs@7777hsjhdfjkbsbdfjkbijkwbiufbdidsbikbfjksbdfijbiuwbheiurhiudebi"
+  secret: ${JWT_SECRET}
 
 cookie:
   expiry: 3600
