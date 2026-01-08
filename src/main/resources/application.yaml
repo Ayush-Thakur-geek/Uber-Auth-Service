@@ -31,6 +31,6 @@ cookie:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:9090/eureka
+      defaultZone: http://${CLOUD_SERVICE:localhost}:9090/eureka
     instance:
       preferIpAddress: true
